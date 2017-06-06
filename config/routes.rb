@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
-  resources :requests
-  resources :items
+
   scope :api do
     resources :users
+    resources :requests
+    resources :items
     post 'register', to: 'authentications#register'
     post 'login', to: 'authentications#login'
 
