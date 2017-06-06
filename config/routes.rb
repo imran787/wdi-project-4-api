@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :requests
+  resources :items
   scope :api do
     resources :users
     post 'register', to: 'authentications#register'
