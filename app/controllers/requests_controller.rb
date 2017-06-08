@@ -16,7 +16,9 @@ class RequestsController < ApplicationController
   # POST /requests
   def create
     # @request = Request.new(request_params)
-    @request = @current_user.requests.create!(request_params)
+    # @request = @current_user.requests.create!(request_params)
+    @request = @current_user.sent_requests.create!(request_params)
+    # @request = @current_user.items_as_buyer.create!(request_params)
 
     if @request.save
       render json: @request, status: :created, location: @request
