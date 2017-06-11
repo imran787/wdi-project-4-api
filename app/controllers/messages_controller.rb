@@ -1,51 +1,39 @@
 class MessagesController < ApplicationController
-  before_action :set_message, only: [:show, :update, :destroy]
+  before_action do
+    @conversation = Conversation.find(params[:conversation_id])
+  end
 
-  # GET /messages
   def index
-    @messages = Message.all
-
-    render json: @messages
+    @messages = @conversation.messages
+    if @messages.length > 10 #only display 10 messages at a time
+      @over_ten = true
+      @messages = @messages[-10..-1]
+    end
+    if params[:m]
+      @over_ten = false
+      @messages = @conversation.messages
+    end
+    if @messages.last
+      if @messages.last.user_id != current_user.id
+        @messages.last.read = true;
+      end
+    end
+    @message = @conversation.messages.new
   end
 
-  # GET /messages/1
-  def show
-    render json: @message
+  def new
+    @message = @conversation.messages.new
   end
 
-  # POST /messages
   def create
-    @message = Message.new(message_params)
-
+    @message = @conversation.messages.new(message_params)
     if @message.save
-      render json: @message, status: :created, location: @message
-    else
-      render json: @message.errors, status: :unprocessable_entity
+      redirect_to conversation_messages_path(@conversation)
     end
-  end
-
-  # PATCH/PUT /messages/1
-  def update
-    if @message.update(message_params)
-      render json: @message
-    else
-      render json: @message.errors, status: :unprocessable_entity
-    end
-  end
-
-  # DELETE /messages/1
-  def destroy
-    @message.destroy
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_message
-      @message = Message.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def message_params
-      params.require(:message).permit(:body, :user_id, :conversation_id, :read)
-    end
+  def message_params
+    params.require(:message).permit(:body, :user_id)
+  end
 end
