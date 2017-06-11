@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  resources :messages
+  resources :conversations
   scope :api do
     resources :users
     resources :requests
