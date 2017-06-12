@@ -15,10 +15,7 @@ class RequestsController < ApplicationController
 
   # POST /requests
   def create
-    # @request = Request.new(request_params)
-    # @request = @current_user.requests.create!(request_params)
     @request = @current_user.sent_requests.create!(request_params)
-    # @request = @current_user.items_as_buyer.create!(request_params)
 
     if @request.save
       render json: @request, status: :created, location: @request
@@ -30,7 +27,16 @@ class RequestsController < ApplicationController
   # PATCH/PUT /requests/1
   def update
     if @request.update(request_params)
-      render json: @request
+      if @request.status === "accepted"
+        item = Item.find(@request.item_id)
+        item.user_id = @request.buyer_id
+        item.save!
+        @request.destroy
+
+        render json: { message: 'Request was successfully accepted' }
+      else
+        render json: @request
+      end
     else
       render json: @request.errors, status: :unprocessable_entity
     end
@@ -42,13 +48,13 @@ class RequestsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_request
-      @request = Request.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_request
+    @request = Request.find(params[:id])
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def request_params
-      params.require(:request).permit(:buyer_id, :seller_id, :item_id, :status)
-    end
+  # Only allow a trusted parameter "white list" through.
+  def request_params
+    params.require(:request).permit(:buyer_id, :seller_id, :item_id, :status)
+  end
 end
