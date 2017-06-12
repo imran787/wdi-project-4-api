@@ -2,8 +2,7 @@ Rails.application.routes.draw do
 
 
   resources :conversations do
-    resources :messages
-  end
+    end
   scope :api do
     resources :users
     resources :requests

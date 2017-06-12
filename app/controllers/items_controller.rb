@@ -15,10 +15,8 @@ class ItemsController < ApplicationController
 
   # POST /items
   def create
-    # @item = Item.new(item_params)
     @item = @current_user.items_as_seller.create!(item_params)
-    # @item = @current_user.items_as_buyer.create!(item_params)
-
+    
     if @item.save
       render json: @item, status: :created, location: @item
     else
